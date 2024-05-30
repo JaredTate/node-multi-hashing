@@ -124,6 +124,7 @@ DECLARE_CALLBACK(m7, m7_hash, 32);
 DECLARE_CALLBACK(m7m, m7m_hash, 32);
 DECLARE_CALLBACK(minotaur, minotaur_hash, 32);
 DECLARE_CALLBACK(nist5, nist5_hash, 32);
+DECLARE_CALLBACK(odo, odo_hash, 32);
 DECLARE_CALLBACK(phi1612, phi1612_hash, 32);
 DECLARE_CALLBACK(quark, quark_hash, 32);
 DECLARE_CALLBACK(qubit, qubit_hash, 32);
@@ -453,28 +454,6 @@ DECLARE_FUNC(boolberry)
     boolberry_hash(input, input_len, scratchpad, spad_len, output, height);
 
     SET_BUFFER_RETURN(output, 32);
-}
-
-DECLARE_FUNC(odo)
-{
-    if (info.Length() < 2)
-        RETURN_EXCEPT("You must provide buffer to hash and key value");
-	
-    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
-
-	if (!Buffer::HasInstance(target))
-		RETURN_EXCEPT("Argument should be a buffer object.");
-
-	unsigned int keyValue = Nan::To<uint32_t>(info[1]).ToChecked();
-
-	char* input = Buffer::Data(target);
-	char output[32];
-
-	uint32_t input_len = Buffer::Length(target);
-
-	odo_hash(input, output, input_len, keyValue);
-
-	SET_BUFFER_RETURN(output, 32);
 }
 
 DECLARE_FUNC(yespower_0_5_R8G)

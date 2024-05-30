@@ -86,6 +86,7 @@
                 "src/sha3/sph_sha2big.c",
                 "src/sha3/sph_tiger.c",
                 "src/sha3/hamsi.c",
+                "src/sha3/KeccakP-800-reference.c",
                 "src/crypto/lyra2.c",
                 "src/crypto/sponge.c",
                 "src/crypto/oaes_lib.c",
@@ -98,6 +99,7 @@
                 "src/crypto/aesb.c",
                 "src/crypto/sha256.c",
                 "src/crypto/wild_keccak.cpp",
+                "src/crypto/odocrypt.cpp",
                 "src/crypto/yespower/yespower.c",
                 "src/crypto/yespower/yespower-opt.c"
             ],

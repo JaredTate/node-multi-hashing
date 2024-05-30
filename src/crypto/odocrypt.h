@@ -14,7 +14,7 @@ public:
     // Block size, in bytes
     const static int DIGEST_SIZE = 80;
 
-private:
+protected:
     // Number of rounds.
     const static int ROUNDS = 84;
     // Odo utilizes two sbox sizes - 6-bit sboxes, which are ideally suited for
@@ -49,7 +49,7 @@ public:
     // test-only, proves that this really is a permutation function
     void Decrypt(char plain[DIGEST_SIZE], const char cipher[DIGEST_SIZE]) const;
 
-private:
+protected:
     struct Pbox
     {
         uint64_t mask[PBOX_SUBROUNDS][STATE_SIZE/2];
