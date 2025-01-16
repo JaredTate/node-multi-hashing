@@ -36,13 +36,15 @@ extern "C"
 #include "scryptjane.h"
 #include "scryptn.h"
 #include "sha1.h"
+#include "sha256.h"
 #include "sha256d.h"
 #include "shavite3.h"
 #include "skein.h"
 #include "skunk.h"
 #include "skydoge.h"
 #include "tribus.h"
-#include "crypto/sponge.h"
+#include "sponge.h"
+#include "vipstar.h"
 #include "whirlpoolx.h"
 #include "x11.h"
 #include "x13.h"
@@ -53,8 +55,8 @@ extern "C"
 #include "x25x.h"
 #include "xevan.h"
 #include "zr5.h"
-#include "crypto/argon2/argon2.h"
-#include "crypto/yespower/yespower.h"
+#include "argon2/argon2.h"
+#include "yespower/yespower.h"
 }
 
 #include "kawpow.hpp"
@@ -522,6 +524,26 @@ DECLARE_FUNC(kawpow)
     SET_BUFFER_RETURN(output, 64);
 }
 
+DECLARE_FUNC(vipstar)
+{
+    if (info.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
+
+    if (!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    uint32_t input[32];
+    uint32_t output[32];
+
+    std::memcpy(input, Buffer::Data(target), sizeof(input));
+
+    vipstar_hash(output, input);
+
+    SET_BUFFER_RETURN(reinterpret_cast<char*>(output), sizeof(output));
+}
+
 NAN_MODULE_INIT(init)
 {
     NAN_EXPORT(target, allium);
@@ -571,6 +593,7 @@ NAN_MODULE_INIT(init)
     NAN_EXPORT(target, skunk);
     NAN_EXPORT(target, skydoge);
     NAN_EXPORT(target, tribus);
+    NAN_EXPORT(target, vipstar);
     NAN_EXPORT(target, whirlpoolx);
     NAN_EXPORT(target, x11);
     NAN_EXPORT(target, x13);
