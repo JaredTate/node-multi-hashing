@@ -5,6 +5,32 @@
 
 #include "vipstar.h"
 
+/* SHA-256 helpers used by sha256d_181_swap. They were called but never
+ * declared or defined; GCC 14+ rejects implicit declarations. */
+static void sha256_init(uint32_t *state)
+{
+	memcpy(state, sha256_h, 32);
+}
+
+static void sha256_transform(uint32_t *state, const uint32_t *block)
+{
+	uint32_t W[64];
+	uint32_t S[8];
+	uint32_t t0, t1;
+	int i;
+
+	memcpy(W, block, 64);
+	for (i = 16; i < 64; i++)
+		W[i] = s1(W[i - 2]) + W[i - 7] + s0(W[i - 15]) + W[i - 16];
+
+	memcpy(S, state, 32);
+	for (i = 0; i < 64; i++)
+		RNDr(S, W, i);
+
+	for (i = 0; i < 8; i++)
+		state[i] += S[i];
+}
+
 void vipstar_hash(uint32_t *output, const uint32_t *input) {
     sha256d_181_swap(output, input);
 }

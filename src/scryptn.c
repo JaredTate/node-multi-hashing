@@ -44,9 +44,12 @@ static void smix(uint8_t *, size_t, uint64_t, uint32_t *, uint32_t *);
 static void
 blkcpy(void * dest, void * src, size_t len)
 {
-	size_t * D = dest;
-	size_t * S = src;
-	size_t L = len / sizeof(size_t);
+	/* Every caller passes uint32_t arrays. Access them as uint32_t:
+	 * reading them through size_t * broke strict aliasing and GCC -O3
+	 * (node-gyp's default) produced wrong scrypt hashes. */
+	uint32_t * D = dest;
+	uint32_t * S = src;
+	size_t L = len / sizeof(uint32_t);
 	size_t i;
 
 	for (i = 0; i < L; i++)
@@ -56,9 +59,9 @@ blkcpy(void * dest, void * src, size_t len)
 static void
 blkxor(void * dest, void * src, size_t len)
 {
-	size_t * D = dest;
-	size_t * S = src;
-	size_t L = len / sizeof(size_t);
+	uint32_t * D = dest;
+	uint32_t * S = src;
+	size_t L = len / sizeof(uint32_t);
 	size_t i;
 
 	for (i = 0; i < L; i++)

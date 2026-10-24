@@ -108,8 +108,12 @@
                 "src/crypto",
                 "<!(node -e \"require('nan')\")"
             ],
+            "cflags": [
+                "-fno-strict-aliasing"
+            ],
             "cflags_cc": [
-                "-std=c++17"
+                "-std=gnu++20",
+                "-fno-strict-aliasing"
             ]
         }
     ]

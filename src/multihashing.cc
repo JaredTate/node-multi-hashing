@@ -2,6 +2,7 @@
 #include <node_buffer.h>
 #include <v8.h>
 #include <stdint.h>
+#include <ctime>
 #include <nan.h>
 
 extern "C"
@@ -126,7 +127,6 @@ DECLARE_CALLBACK(m7, m7_hash, 32);
 DECLARE_CALLBACK(m7m, m7m_hash, 32);
 DECLARE_CALLBACK(minotaur, minotaur_hash, 32);
 DECLARE_CALLBACK(nist5, nist5_hash, 32);
-DECLARE_CALLBACK(odo, odo_hash, 32);
 DECLARE_CALLBACK(phi1612, phi1612_hash, 32);
 DECLARE_CALLBACK(quark, quark_hash, 32);
 DECLARE_CALLBACK(qubit, qubit_hash, 32);
@@ -232,6 +232,33 @@ DECLARE_FUNC(argon2id)
     uint32_t input_len = Buffer::Length(target);
 
     argon2id_hash_raw(tValue, mValue, pValue, input, input_len, input, input_len, output, 32);
+
+    SET_BUFFER_RETURN(output, 32);
+}
+
+// odo(data, nTime): the odo key comes from the block header nTime, as in
+// DigiByte consensus. stratum-pool passes it as the second argument.
+// Without it, the current time is used (the old behaviour).
+DECLARE_FUNC(odo)
+{
+    if (info.Length() < 1)
+        RETURN_EXCEPT("You must provide one argument.");
+
+    Local<Object> target = Nan::To<Object>(info[0]).ToLocalChecked();
+
+    if (!Buffer::HasInstance(target))
+        RETURN_EXCEPT("Argument should be a buffer object.");
+
+    uint32_t input_len = Buffer::Length(target);
+    if (input_len >= 100)
+        RETURN_EXCEPT("Input must be shorter than 100 bytes.");
+
+    uint32_t nTime = (info.Length() >= 2 && info[1]->IsNumber())
+        ? Nan::To<uint32_t>(info[1]).ToChecked()
+        : (uint32_t)time(NULL);
+
+    char output[32];
+    odo_hash(Buffer::Data(target), output, input_len, nTime);
 
     SET_BUFFER_RETURN(output, 32);
 }
@@ -534,10 +561,14 @@ DECLARE_FUNC(vipstar)
     if (!Buffer::HasInstance(target))
         RETURN_EXCEPT("Argument should be a buffer object.");
 
-    uint32_t input[32];
-    uint32_t output[32];
+    // vipstar_hash reads three 64-byte blocks (48 words) and writes 8 words.
+    uint32_t input[48] = {0};
+    uint32_t output[8];
 
-    std::memcpy(input, Buffer::Data(target), sizeof(input));
+    size_t input_len = Buffer::Length(target);
+    if (input_len > sizeof(input))
+        input_len = sizeof(input);
+    std::memcpy(input, Buffer::Data(target), input_len);
 
     vipstar_hash(output, input);
 

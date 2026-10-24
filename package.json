@@ -12,11 +12,12 @@
     },
     "scripts": {
         "build": "node-gyp rebuild",
-        "test": "mocha --require @babel/register --gc-global tests/test.vectors.js"
+        "test": "mocha --require @babel/register --gc-global tests/test.vectors.js && npm run test:pool",
+        "test:pool": "node --test tests/pool-algos.test.js"
     },
     "dependencies": {
         "bindings": "^1.5.0",
-        "nan": "^2.20.0"
+        "nan": "^2.22.2"
     },
     "keywords": [
         "argon2",
@@ -36,7 +37,7 @@
     ],
     "devDependencies": {
         "@babel/register": "^7.24.6",
-        "mocha": "^10.7.3"
+        "mocha": "^12.0.3"
     },
     "release": {
         "branches": [
